@@ -7,10 +7,13 @@ namespace ai4u
 		private NodePath controllerPath;
 		private Controller controller;
 	
-		public override void OnSetup(Agent agent)
+		void Awake()
 		{
+			if (!enabled)
+			{
+				return;
+			}
 			controller = GetNode<Controller>(controllerPath);
-			base.OnSetup(agent);
 			if (agent == null)
 			{
 				agent = GetParent<Agent>();
@@ -19,10 +22,10 @@ namespace ai4u
 				GD.Print("You must specify a controller for the game object: " + Name);
 			}
 
-			if (agent == null) {
-				GD.Print("You must specify an agent for the game object: " + Name);
+			if (agentPath == null) {
+				GD.Print("You have not defined the agent that the remote brain must control. Game Object: " + Name);
 			}
-
+			agent = GetNode<Agent>(agentPath);
 			agent.SetBrain(this);
 			agent.Setup();
 		}
@@ -31,6 +34,11 @@ namespace ai4u
 		{
 			controller.ReceiveState(desc, tipo, valor);
 			return controller.GetAction();
+		}
+
+		public override void _Ready()
+		{
+			Awake();
 		}
 	}
 }

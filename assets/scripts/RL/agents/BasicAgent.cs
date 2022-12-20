@@ -49,6 +49,11 @@ namespace ai4u
 		
 		public override void Setup()
 		{
+
+			if (controlRequestorPath == null)
+            {
+                throw new System.Exception("ControlRequestor is mandatory to BasicAgent! Set a ControlRequestor component for this agent.");
+            }
 			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 			avatarBody = GetNode<Node>(avatarPath);
@@ -107,13 +112,16 @@ namespace ai4u
 			desc = new string[numberOfSensors];
 			types = new byte[numberOfSensors];
 			values = new string[numberOfSensors];
-			
+
+			controlRequestor = GetNode<ControlRequestor>(controlRequestorPath);
+			controlRequestor.SetAgent(this);
+
 			RequestCommand request = new RequestCommand(3);
 			request.SetMessage(0, "__target__", ai4u.Brain.STR, "envcontrol");
 			request.SetMessage(1, "max_steps", ai4u.Brain.INT, MaxStepsPerEpisode);
 			request.SetMessage(2, "id", ai4u.Brain.STR, ID);
-
-			var cmds = brain.ControlRequestor.RequestEnvControl(request);
+			
+			var cmds = controlRequestor.RequestEnvControl(this, request);
 			if (cmds == null)
 			{
 				throw new System.Exception("ai4u2unity connection error!");

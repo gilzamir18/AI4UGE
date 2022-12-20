@@ -3,6 +3,16 @@ using System.Collections.Generic;
 
 namespace ai4u
 {
+
+    public class AgentControlInfo
+    {
+        public bool paused = false;
+        public bool stopped = true;
+        public bool applyingAction = false;
+        public int frameCounter = -1;
+        public Command[] lastCmd;
+    }
+
 	///<summary>
 	///An agent is an object that supports the cycle of updating the state 
 	///represented by the tuple (s[t], a, s[t + 1]), where s [t] is the current 
@@ -10,7 +20,6 @@ namespace ai4u
 	///in s[t+1]. An agent receives an action or command from a controlle (instance of the Brain class),
 	///executes this action in the environment and returns to the controller the resulting 
 	///state named s[t+t1]. </summary>
-
 	public abstract class Agent : Node
 	{
 		public delegate void ResetHandler(Agent source);
@@ -18,8 +27,11 @@ namespace ai4u
 		public event ResetHandler resetEvent;
 
 		protected Brain brain;
+		[Export]
 		public string ID = "0";
-
+		[Export]
+		public NodePath controlRequestorPath;
+        public ControlRequestor controlRequestor;
 		public int numberOfFields = 0;
 		
 		protected int nSteps;
@@ -27,6 +39,20 @@ namespace ai4u
 		protected byte[] types;
 		protected string[] values;
 		protected bool setupIsDone = false;
+        private AgentControlInfo controlInfo;
+	
+        public AgentControlInfo ControlInfo 
+        {
+            set 
+            {
+                controlInfo = value;
+            }
+
+            get 
+            {
+                return controlInfo;
+            }
+        }
 
 		public byte[] MessageType
 		{
@@ -64,6 +90,20 @@ namespace ai4u
 				return desc;
 			}
 		}
+
+        public ControlRequestor ControlRequestor
+        {
+            get
+            {
+				if (controlRequestor == null)
+				{
+					controlRequestor = GetNode<ControlRequestor>(controlRequestorPath);
+				}
+
+                return controlRequestor;
+            }
+        }
+
 
 		public void AddResetListener(IAgentResetListener listener) 
 		{
@@ -301,21 +341,20 @@ namespace ai4u
 		protected string[] receivedargs;
 		private Dictionary<string, string[]> commandFields;
 		
-		protected Agent agent = null;
-		protected ControlRequestor controlRequestor;
 
-		public ControlRequestor ControlRequestor
-		{
-			get
-			{
-				return controlRequestor;
-			}
-			
-			set
-			{
-				controlRequestor = value;
-			}
-		}
+		[Export]
+		public bool enabled = true;
+
+		[Export]
+		public NodePath agentPath;
+		public Agent agent = null;
+        
+		[Export]
+		public int skipFrame = 0;
+        
+		[Export]
+		public bool repeatAction = false;
+
 
 		public void SetCommandFields(Dictionary<string, string[]>  cmdField)
 		{
@@ -361,12 +400,6 @@ namespace ai4u
 			{
 				return commandFields[cmd];
 			}
-		}
-		
-		// Called when the node enters the scene tree for the first time.
-		public virtual void OnSetup(Agent agent)
-		{
-			this.agent = agent;
 		}
 	}
 
