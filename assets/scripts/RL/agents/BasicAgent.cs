@@ -46,6 +46,7 @@ namespace ai4u
 		private List<Sensor> sensorList;
 		private int numberOfSensors = 0;
 		private int numberOfActuators = 0;
+		private ModelMetadataLoader metadataLoader;
 		
 		public override void Setup()
 		{
@@ -88,21 +89,25 @@ namespace ai4u
 			
 
 			DoneSensor doneSensor = new DoneSensor();
+			doneSensor.isInput = false;
 			doneSensor.SetAgent(this);
 			sensorList.Add(doneSensor);
 			CallDeferred("add_child", doneSensor);
 
 			RewardSensor rewardSensor = new RewardSensor();
+			rewardSensor.isInput = false;
 			rewardSensor.SetAgent(this);
 			sensorList.Add(rewardSensor);
 			CallDeferred("add_child", rewardSensor);
 
 			IDSensor idSensor = new IDSensor();
+			idSensor.isInput = false;
 			idSensor.SetAgent(this);
 			sensorList.Add(idSensor);
 			CallDeferred("add_child", idSensor);
 
 			StepSensor stepSensor = new StepSensor();
+			stepSensor.isInput = false;
 			stepSensor.SetAgent(this);
 			sensorList.Add(stepSensor);
 			CallDeferred("add_child", stepSensor);
@@ -115,18 +120,6 @@ namespace ai4u
 
 			controlRequestor = GetNode<ControlRequestor>(controlRequestorPath);
 			controlRequestor.SetAgent(this);
-
-			RequestCommand request = new RequestCommand(3);
-			request.SetMessage(0, "__target__", ai4u.Brain.STR, "envcontrol");
-			request.SetMessage(1, "max_steps", ai4u.Brain.INT, MaxStepsPerEpisode);
-			request.SetMessage(2, "id", ai4u.Brain.STR, ID);
-			
-			var cmds = controlRequestor.RequestEnvControl(this, request);
-			if (cmds == null)
-			{
-				throw new System.Exception("ai4u2unity connection error!");
-			}
-			setupIsDone = true;
 			
 			foreach (Sensor sensor in sensorList)
 			{
@@ -142,6 +135,23 @@ namespace ai4u
 			{
 				a.OnSetup(this);
 			}
+
+			metadataLoader = new ModelMetadataLoader(this);
+            string metadatastr = metadataLoader.toJson();
+
+			RequestCommand request = new RequestCommand(5);
+			request.SetMessage(0, "__target__", ai4u.Brain.STR, "envcontrol");
+			request.SetMessage(1, "max_steps", ai4u.Brain.INT, MaxStepsPerEpisode);
+			request.SetMessage(2, "id", ai4u.Brain.STR, ID);
+            request.SetMessage(3, "modelmetadata", ai4u.Brain.STR, metadatastr);
+			request.SetMessage(4, "config", ai4u.Brain.INT, 1);
+
+			var cmds = controlRequestor.RequestEnvControl(this, request);
+			if (cmds == null)
+			{
+				throw new System.Exception("ai4u2unity connection error!");
+			}
+			setupIsDone = true;
 		}
 		
 		public void ResetReward()
@@ -172,7 +182,22 @@ namespace ai4u
 			}
 		}
 		
-		
+		public List<Actuator> Actuators
+        {
+            get 
+            {
+                return actuatorList;
+            }
+        }
+
+        public List<Sensor> Sensors 
+        {
+            get
+            {
+                return sensorList;
+            }
+        }
+
 		public bool Done
 		{
 			get

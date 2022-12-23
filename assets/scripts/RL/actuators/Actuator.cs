@@ -10,6 +10,9 @@ namespace ai4u
 		[Export]
 		public string actionName;
 		
+		[Export]
+		public bool isOutput = true;
+
 		private bool actionDone = false;
 		protected int[] shape;
 		protected bool isContinuous;

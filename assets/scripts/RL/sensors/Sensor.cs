@@ -18,15 +18,17 @@ namespace ai4u
 	{
 		
 		[Export]
-		protected string perceptionKey;
+		public string perceptionKey;
 		[Export]
-		protected int stackedObservations = 1;
+		public int stackedObservations = 1;
 		[Export]
-		protected bool isActive = true;
+		public bool isActive = true;
 		[Export]
-		protected bool  normalized = true;
+		public bool isInput = true;
 		[Export]
-		protected bool resetable = true;
+		public bool  normalized = true;
+		[Export]
+		public bool resetable = true;
 
 		protected SensorType Type;
 		protected bool IsState;
