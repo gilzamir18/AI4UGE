@@ -29,6 +29,10 @@ namespace ai4u
 		public bool  normalized = true;
 		[Export]
 		public bool resetable = true;
+		[Export]
+		public float rangeMin = 0.0f;
+		[Export]
+		public float rangeMax = 1.0f;
 
 		protected SensorType Type;
 		protected bool IsState;

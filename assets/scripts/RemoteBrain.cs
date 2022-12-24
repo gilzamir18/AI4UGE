@@ -29,7 +29,8 @@ namespace ai4u
         [Export]
         public int port = 8080;
 
-        public int receiveTimeout = 10;
+        [Export]
+        public int receiveTimeout = 200;
         private IPAddress serverAddr; //controller address
         private EndPoint endPoint; //controller endpoint
         private Socket sockToSend; //Socket to send async message.

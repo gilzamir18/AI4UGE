@@ -11,25 +11,22 @@ namespace ai4u
         public string name;
         public int[] shape;
         public SensorType type;
+        public float rangeMin;
+        public float rangeMax;
 
-        public ModelInput(string name, SensorType type, int[] shape, int stackedObservations)
+        public ModelInput(string name, SensorType type, int[] shape, int stackedObservations, float rangeMin, float rangeMax)
         {
             this.name = name;
-            if (stackedObservations == 1)
+            
+            this.shape = new int[shape.Length + 1];
+            this.shape[0] = stackedObservations;
+            for (int i = 1; i < this.shape.Length; i++)
             {
-                this.shape = shape;
+                this.shape[i] = shape[i-1];
             }
-            else
-            {
-                this.shape = new int[shape.Length + 1];
-                this.shape[0] = stackedObservations;
-                for (int i = 1; i < this.shape.Length; i++)
-                {
-                    this.shape[i] = shape[i];
-                }
-            }
-
             this.type = type;
+            this.rangeMin = rangeMin;
+            this.rangeMax = rangeMax;
         }
     }
 
@@ -40,12 +37,17 @@ namespace ai4u
         public bool isContinuous;
         public int[] shape;
 
+        public float[] rangeMin;
+        public float[] rangeMax;
 
-        public ModelOutput(string name, int[] shape, bool isContinuous)
+
+        public ModelOutput(string name, int[] shape, bool isContinuous, float[] rangeMin, float[] rangeMax)
         {
             this.name = name;
             this.shape = shape;
             this.isContinuous = isContinuous;
+            this.rangeMin = rangeMin;
+            this.rangeMax = rangeMax;
         }
     }
 

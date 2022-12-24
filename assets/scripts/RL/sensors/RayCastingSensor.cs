@@ -82,19 +82,32 @@ namespace ai4u
 		[Export]
 		public float fieldOfView = 90.0f;
 
+		[Export]
+		public bool debugEnabled = false;
+
+		[Export]
+		public bool flattened = false;
+
 		private Dictionary<string, int> mapping;
 		private Ray[,] raysMatrix = null;
 		private HistoryStack<float> history;
 		private PhysicsDirectSpaceState spaceState;
 		
-		[Export]
-		public bool debugEnabled = false;
 
 		public override void OnSetup(Agent agent) 
 		{
 			type = SensorType.sfloatarray;
-			shape = new int[2]{hSize,  vSize};
-			history = new HistoryStack<float>(stackedObservations * shape[0] * shape[1]);
+			if (!flattened)
+			{
+				shape = new int[2]{hSize,  vSize};
+				history = new HistoryStack<float>(stackedObservations * shape[0] * shape[1]);
+			}
+			else
+			{
+				shape = new int[1]{hSize * vSize};
+				history = new HistoryStack<float>(stackedObservations * shape[0]);
+			}
+			
 			agent.AddResetListener(this);
 			
 			mapping = new Dictionary<string, int>();
@@ -107,7 +120,7 @@ namespace ai4u
 			} else {
 				this.eye = this.agent.GetAvatarBody() as Spatial;
 			}
-			raysMatrix = new Ray[shape[0], shape[1]];
+			raysMatrix = new Ray[hSize, vSize];
 		}
 
 		public override float[] GetFloatArrayValue()
@@ -122,25 +135,25 @@ namespace ai4u
 
 		private void UpdateRaysMatrix(Vector3 position, Vector3 forward, Vector3 up, Vector3 right, float fieldOfView = 45.0f)
 		{
-			float vangle = 2 * fieldOfView / shape[0];
-			float hangle = 2 * fieldOfView / shape[1];
+			float vangle = 2 * fieldOfView / hSize;
+			float hangle = 2 * fieldOfView / vSize;
 
 			
 			float iangle = -fieldOfView;
 			
 			var debugline = 0;
-			for (int i = 0; i < shape[0]; i++)
+			for (int i = 0; i < hSize; i++)
 			{
 				var k1 = 1;
-				if (shape[0] <= 1)
+				if (hSize <= 1)
 				{
 					k1 = 0;
 				}
 				var fwd = forward.Rotated(up, Mathf.Deg2Rad( (iangle * k1 + horizontalShift)  + vangle * i) ).Normalized();
-				for (int j = 0; j < shape[1]; j++)
+				for (int j = 0; j < vSize; j++)
 				{
 					var k2 = 1;
-					if (shape[1] <= 1)
+					if (vSize <= 1)
 					{
 						k2 = 0;
 					}
@@ -200,6 +213,14 @@ namespace ai4u
 		}
 		
 		public override void OnReset(Agent agent) {
+            if (!flattened)
+            {
+                history = new HistoryStack<float>(stackedObservations * shape[0] * shape[1]);
+            }
+            else
+            {
+                history = new HistoryStack<float>(stackedObservations * shape[0]);
+            }
 			mapping = new Dictionary<string, int>();
 			
 			for (int o = 0; o < groupName.Length; o++ )
@@ -208,7 +229,7 @@ namespace ai4u
 				var name = groupName[o];
 				mapping[name] = code;
 			}
-			raysMatrix = new Ray[shape[0], shape[1]];
+			raysMatrix = new Ray[hSize, vSize];
 		} 
 	}
 }

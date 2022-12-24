@@ -20,7 +20,7 @@ namespace ai4u
             {
                 if (s.isInput)
                 {
-                    inputs.Add(new ModelInput(s.perceptionKey, s.type, s.shape, s.stackedObservations));
+                    inputs.Add(new ModelInput(s.perceptionKey, s.type, s.shape, s.stackedObservations, s.rangeMin, s.rangeMax));
                 }
             }
 
@@ -28,7 +28,7 @@ namespace ai4u
             {
                 if (a.isOutput)
                 {
-                    outputs.Add(new ModelOutput(a.actionName, a.Shape, a.IsContinuous));
+                    outputs.Add(new ModelOutput(a.actionName, a.Shape, a.IsContinuous, a.RangeMin, a.RangeMax));
                 }
             }
 
