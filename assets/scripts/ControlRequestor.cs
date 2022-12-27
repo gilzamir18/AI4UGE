@@ -21,7 +21,10 @@ namespace ai4u
     {
      
 		[Export]
-	    public float defaultTimeScale = 1.0f; 
+	    public float defaultTimeScale = 1.0f;
+
+        [Export]
+        public bool physicsMode = true;
 
         private SortedList<string, Agent> agents;
 
@@ -139,11 +142,27 @@ namespace ai4u
         }
         
 
-		public override void _PhysicsProcess(float delta)
+		public void AgentsProcess(float delta)
 		{
             foreach(var entry in agents)
             {
                 AgentUpdate(entry.Value);
+            }
+        }
+
+        public override void _PhysicsProcess(float delta)
+        {
+            if (physicsMode)
+            {
+                AgentsProcess(delta);
+            }
+        }
+
+        public override void _Process(float delta)
+        {
+            if (!physicsMode)
+            {
+                AgentsProcess(delta);
             }
         }
 

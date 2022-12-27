@@ -16,21 +16,17 @@ namespace ai4u
 		///managed manually. Thus, in this case, command 
 		///line arguments do not alter the properties of 
 		///the remote brain.</summary>
-		[Export]
-		private bool managed = false;
+		[Export] private bool managed = false;
+        [Export] public string host = "127.0.0.1";
+        ///<summary>The server port of the ai4u2unity training server.</summary>
+        [Export] public int port = 8080;
+        [Export] public int receiveTimeout = 200;
+        [Export] public int receiveBufferSize = 8192;
+        [Export] public int SendBufferSize = 8192;
 		private float timeScale = 1.0f; //unity controll of the physical time.
 		private bool runFirstTime = false;
         private ControlRequestor controlRequestor;
         ///<summary>The IP of the ai4u2unity training server.</summary>
-        [Export]
-        public string host = "127.0.0.1";
-        
-        ///<summary>The server port of the ai4u2unity training server.</summary>
-        [Export]
-        public int port = 8080;
-
-        [Export]
-        public int receiveTimeout = 200;
         private IPAddress serverAddr; //controller address
         private EndPoint endPoint; //controller endpoint
         private Socket sockToSend; //Socket to send async message.
@@ -40,6 +36,10 @@ namespace ai4u
 			{
 				return;
 			}
+            if (agent != null && agent.SetupIsDone)
+            {
+                return;
+            }
 			//one time configuration
 			if (!managed && runFirstTime){
 				runFirstTime =false;
@@ -102,6 +102,8 @@ namespace ai4u
 		public bool sendData(byte[] data, out int total, byte[] received)
         {
             TrySocket().ReceiveTimeout = receiveTimeout;
+            TrySocket().ReceiveBufferSize = receiveBufferSize;
+            TrySocket().SendBufferSize = SendBufferSize;
             sockToSend.SendTo(data, endPoint);
             total = 0;
             try 

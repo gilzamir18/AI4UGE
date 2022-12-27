@@ -7,7 +7,9 @@ namespace ai4u
 	{
 		private string[] desc;
 		private byte[] type;
-		private string[] value;
+		protected string[] value;
+
+		protected Agent agent;
 
 
 		public Controller(): base()
@@ -15,6 +17,11 @@ namespace ai4u
 			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		}
 
+
+		public void Setup(Agent agent)
+		{
+			this.agent = agent;
+		}
 
 		public virtual string GetAction()
 		{

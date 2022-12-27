@@ -13,6 +13,11 @@ namespace ai4u
 			{
 				return;
 			}
+			
+			if (agentPath == null) {
+				GD.Print("You have not defined the agent that the remote brain must control. Game Object: " + Name);
+			}
+			agent = GetNode<Agent>(agentPath);
 			controller = GetNode<Controller>(controllerPath);
 			if (agent == null)
 			{
@@ -22,12 +27,9 @@ namespace ai4u
 				GD.Print("You must specify a controller for the game object: " + Name);
 			}
 
-			if (agentPath == null) {
-				GD.Print("You have not defined the agent that the remote brain must control. Game Object: " + Name);
-			}
-			agent = GetNode<Agent>(agentPath);
 			agent.SetBrain(this);
 			agent.Setup();
+			controller.Setup(agent);
 		}
 
 		public string SendMessage(string[] desc, byte[] tipo, string[] valor)

@@ -20,6 +20,9 @@ namespace ai4u
 
 		[Export]
 		private NodePath avatarPath;
+		[Export]
+		private string avatarGlobalPath;
+		
 		private Node avatarBody;
 
 		///<summary> <code>doneAtNegativeReward</code> ends the simulation whenever the agent receives a negative reward.</summary>		
@@ -50,15 +53,22 @@ namespace ai4u
 		
 		public override void Setup()
 		{
-
+			GD.Print("SETUP");
 			if (controlRequestorPath == null)
             {
                 throw new System.Exception("ControlRequestor is mandatory to BasicAgent! Set a ControlRequestor component for this agent.");
             }
 			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-			avatarBody = GetNode<Node>(avatarPath);
 
+			if (avatarPath != null && !avatarPath.IsEmpty())
+			{
+				avatarBody = GetNode<Node>(avatarPath);
+			}
+			else
+			{
+				avatarBody = GetNode<Node>(avatarGlobalPath);
+			}
 			actuatorList = new List<Actuator>();
 			rewards = new List<RewardFunc>();
 			sensorList = new List<Sensor>();
@@ -108,6 +118,9 @@ namespace ai4u
 
 			StepSensor stepSensor = new StepSensor();
 			stepSensor.isInput = false;
+			stepSensor.maxSize = MaxStepsPerEpisode;
+			stepSensor.discrete = true;
+			stepSensor.normalized = false;
 			stepSensor.SetAgent(this);
 			sensorList.Add(stepSensor);
 			CallDeferred("add_child", stepSensor);
@@ -343,6 +356,14 @@ namespace ai4u
 				Sensor s = sensorList[i];
 				switch(s.type)
 				{
+					case SensorType.sintarray:
+						var iv = s.GetIntArrayValue();
+						if (iv == null)
+						{
+							GD.Print("Error: array of float sensor " + s.Name + " returning null value!");
+						}
+						SetStateAsIntArray(i, s.PerceptionKey, iv);
+						break;
 					case SensorType.sfloatarray:
 						var fv = s.GetFloatArrayValue();
 						if (fv == null)

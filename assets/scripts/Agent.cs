@@ -160,6 +160,13 @@ namespace ai4u
 			this.values[i] = string.Join(" ", value);
 		}
 
+		public void SetStateAsIntArray(int i, string desc, int[] value)
+		{
+			this.desc[i] = desc;
+			this.types[i] = Brain.FLOAT_ARRAY;
+			this.values[i] = string.Join(" ", value);
+		}
+
 		public void SetStateAsInt(int i, string desc, int value)
 		{
 			this.desc[i] = desc;
@@ -244,7 +251,15 @@ namespace ai4u
 
 		public bool GetActionArgAsBool(int i = 0)
 		{
-			return bool.Parse(this.brain.GetReceivedArgs()[i]);
+			try
+			{
+				return bool.Parse(this.brain.GetReceivedArgs()[i]);
+			}
+			catch
+			{
+				float[] a = GetActionArgAsFloatArray();
+				return a[i] > 0;
+			}
 		}
 
 		public float[] GetActionArgAsFloatArray()

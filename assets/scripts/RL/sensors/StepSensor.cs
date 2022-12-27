@@ -8,15 +8,15 @@ namespace ai4u
 	{
 		
 		[Export]
-		private int maxSize=300;
+		public int maxSize=300;
 		[Export]
-		private bool realNumber;
+		public bool discrete;
 		
 		public override void OnSetup(Agent agent)
 		{
 			this.agent = (BasicAgent) agent;
 			perceptionKey = "steps";
-			if (!realNumber)
+			if (discrete)
 			{
 				type = SensorType.sint;
 			}

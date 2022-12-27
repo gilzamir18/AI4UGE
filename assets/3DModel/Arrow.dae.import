@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/Arrow.dae-5af16da249a0b2844136a982902c5685.scn"
+path="res://.import/Arrow.dae-89941f02a68dfb5ce83b97cee596b7f4.scn"
 
 [deps]
 
-source_file="res://assets/3DModel/Arrow.dae"
-dest_files=[ "res://.import/Arrow.dae-5af16da249a0b2844136a982902c5685.scn" ]
+source_file="res://AI4UGE/assets/3DModel/Arrow.dae"
+dest_files=[ "res://.import/Arrow.dae-89941f02a68dfb5ce83b97cee596b7f4.scn" ]
 
 [params]
 
